@@ -1,5 +1,10 @@
 
 <?php
+
+header("Content-Type: application/json");
+header("Acess-Control-Allow-Origin: *");
+header("Acess-Control-Allow-Methods: POST");
+
 //We need firstname, lastname, and the login and password
 $inData = getRequestInfo();
 
@@ -14,17 +19,21 @@ if( $conn->connect_error )
 }
 else
 {
+
+
     $query = "INSERT INTO COP4331.Users(FirstName, LastName, Login, Password) VALUES (\"".$inData["firstname"]."\",\"".$inData["lastname"]."\",\"".$inData["login"]."\",\"".$inData["password"]."\")";
     $msg = [];
     try{
         $msg["successful"] = true;
         $result = mysqli_query($conn,$query);
-        sendResultInfoAsJson( $msg );
+        http_response_code(200);
+        sendResultInfoAsJson($msg);
     }
     catch(exception)
     {
         $msg["successful"] = false;
-        sendResultInfoAsJson( $msg );
+        http_response_code(409);
+        sendResultInfoAsJson($msg);
     }
     
     $conn->close();
@@ -37,7 +46,6 @@ function getRequestInfo()
 
 function sendResultInfoAsJson( $obj )
 {
-    header('Content-type: application/json');
-    echo $obj;
+    echo json_encode($obj);
 }
 ?>
