@@ -60,7 +60,7 @@ else
     while ($row = mysqli_fetch_assoc($result)) {
         $id = $row['ID'];
         //$dateCreated = $row['DateCreated'];
-        //$dateLastLoggedIn = $row['DateLastLoggedIn'];
+        //$dateLastLoggedIn = $row['DateLastLoggedIn']
         $firstName = $row['FirstName'];
         $lastName = $row['LastName'];
         $email = $row['email'];
