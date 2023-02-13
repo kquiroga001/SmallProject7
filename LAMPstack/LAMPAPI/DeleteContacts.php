@@ -30,24 +30,28 @@ else
     }
 
     $userId = $inData["userid"];
-    $contactID = $inData["contactid"];
+    $contactId = $inData["contactid"];
+    
+    $stmt = $conn->prepare('DELETE FROM Contacts WHERE UserID = ? AND ID = ?');
+    $stmt->bind_param('ii', $userId,$contactId); // 's' specifies the variable type => 'string'
+    $stmt->execute();
+    $deleteResult = $stmt->get_result();
 
-    $deleteStatement = "DELETE FROM Contacts WHERE UserID = $userId AND ID = $contactID";
-
-    $deleteResult = mysqli_query($conn,$deleteStatement);
+    
+    //$deleteResult `= mysqli_query($conn,$deleteStatement);
     $affected = $conn->affected_rows;
 
     if($affected == 0)
     {
         http_response_code(404);
         $msg = array();
-        $msg["error"] = "Contact doesn't exist";
+        $msg["success"] = false;
         echo json_encode($msg);
         return;
     }
 
     $msg = [];
-    $msg["successful"] = true;
+    $msg["success"] = true;
     echo json_encode($msg);
     
     mysqli_close($conn);
