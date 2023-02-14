@@ -142,6 +142,7 @@ function register()
 					document.getElementById("loginResult").innerHTML = "One or more fields missing";
 					return;
 				}
+				if()
 			}
 		};
 		xhr.send(jsonPayload);
@@ -158,11 +159,13 @@ function fieldCheck(){
 	let login = document.getElementById("loginName").value;
 	let password = document.getElementById("loginPassword").value;
 	if(firstName=="" || lastName=="" || login=="" || password==""){
-		document.getElementById("loginResult").value = "One or more fields missing";
+		document.getElementById("loginResult").innerHTML = "One or more fields missing";
 		return;
 	}
-	else 
+	else{
 		register();
+		document.getElementById("loginResult").innerHTML = "";
+	}
 }
 
 
