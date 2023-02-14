@@ -1,13 +1,18 @@
 body 
 {
-    background-color: #707070;
+    margin: 0;
+    height: 100vh;
+    display: block;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background-color: #6c1b86;
 }
 
 #title 
 {
-    font-size: 40px;
+    font-size: 65px;
     width: 100%;
-    margin: 2% 5%;
     text-align: center;
     font-family: 'Ubuntu', sans-serif;
     color: #FFFFFF;
@@ -15,53 +20,146 @@ body
 
 #loginDiv
 {
-    font-size: 30px;
-    width: 70%;
-    margin-left: 15%;
-    padding: 25px;
-    background-color: #b2b2b2;
+    width: 400px;
+    max-width: 400px;
+    margin: auto;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius);
+    background: #FFFFFF;
+}
+
+#inner-title{
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 50px;
+}
+
+#text_group{
+    margin-bottom: 1rem;
+}
+
+#firstName{
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #dddddd;
+    outline: none;
+    background: #eeeeee;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#lastName{
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #dddddd;
+    outline: none;
+    background: #eeeeee;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#loginName{
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #dddddd;
+    outline: none;
+    background: #eeeeee;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#loginPassword{
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #dddddd;
+    outline: none;
+    background: #eeeeee;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#firstName:focus{
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+#lastName:focus{
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+#loginName:focus{
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+#loginPassword:focus{
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+#loginButton{
+        font: 500 1rem 'Quicksand', sans-serif;
+}
+
+#buttons
+{
+    width: 100%;
+    padding: 1rem 2rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
+    cursor: pointer;
+    background: var(--color-primary);
+}
+
+#buttons:hover{
+    background: var(--color-primary-dark);
+}
+
+#buttons:active{
+    transform: scale(0.98);
+}
+
+#linkCreateAccount{
+    color: var(--color-secondary);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#linkCreateAccount:hover{
+    text-decoration: underline;
 }
 
 #loggedInDiv
 {
     font-size: 30px;
     width: 70%;
-    margin-left: 15%;
+    margin: auto;
     padding: 25px;
-    background-color: #b2b2b2;
+    background-color: #D7CDC1;
 }
 
 #accessUIDiv
 {
     font-size: 30px;
     width: 70%;
-    margin-left: 15%;
+    margin: auto;
     padding: 25px;
-    background-color: #b2b2b2;
-}
-
-.buttons
-{
-    font-size: 30px;
-    border-radius: 25px;
-    width: 50%;
-    margin-left: 25%;
-    font-family: 'Ubuntu', sans-serif;
-}
-
-.buttons:hover{
-    background-color: #00d5124f;
-    color: #FFFFFF;
-    opacity: 50%;
-}
-
-#loginName
-{
-	font-size: 30px;
-}
-#loginPassword
-{
-	font-size: 30px;
+    background-color: #D7CDC1;
 }
 #searchText
 {
@@ -72,25 +170,14 @@ body
 	font-size: 30px;
 }
 
-input[type="text"],input[type="password"]{
+/*input[type="text"],input[type="password"]{
     border-radius: 25px;
     text-align: center;
     width: 80%;
     margin-left: 10%;
     margin-bottom: 2%;
     font-family: 'Ubuntu', sans-serif;
-}
-
-#inner-title{
-    display: inline-block;
-    font-size: 0.8em;
-    width: 90%;
-    text-align: center;
-    margin-left: 5%;
-    margin-bottom: 2%;
-    font-family: 'Ubuntu', sans-serif;
-    color: #95060a;
-}
+}*/
 
 #loginResult{
     display: inline-block;
