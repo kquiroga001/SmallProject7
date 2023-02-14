@@ -15,7 +15,7 @@ if( $conn->connect_error )
 else
 {
     //$stmt = $conn->prepare("SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password =?");
-    $stmt = $conn->prepare(("INSERT INTO COP4331.Users(FirstName, LastName, Login, Password) VALUES (?,?,?,?)");
+    $stmt = $conn->prepare(("INSERT INTO COP4331.Users(FirstName, LastName, Login, Password) VALUES (?,?,?,?)"));
 
     $stmt->bind_param("ss", $inData["firstname"],$inData["lastname"],$inData["login"], $inData["password"]);
     $stmt->execute();
