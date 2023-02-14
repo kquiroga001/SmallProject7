@@ -36,35 +36,63 @@ else
     $perPage = (isset($inData["perpage"])) ? $inData["perpage"] : 10;
     $skipped = $perPage * ($page-1);
 
-    $queryStatement = empty($contactName) ? "SELECT * FROM Contacts WHERE UserID = $userId LIMIT $skipped, $perPage" :
-    "SELECT * FROM Contacts WHERE UserID = $userId AND (concat_ws(FirstName,'',LastName) LIKE \"$contactName%\" OR concat_ws(LastName,'',FirstName) LIKE \"$contactName%\") LIMIT $skipped, $perPage";
-    //SELECT * FROM Users WHERE concat_ws(FirstName,"",LastName) LIKE "%Jo%" LIMIT 2, 2
-    $result = mysqli_query($conn, $queryStatement);
+    $countStatement = null;
 
-    if (mysqli_num_rows($result) == 0) {
-        http_response_code(204);
+    error_reporting(E_ALL);
+    ini_set('display_errors', 'On');
+
+    if(empty($contactName))
+    {
+        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ?");
+		$countStatement->bind_param("iii", $userId);
+		$countStatement->execute();    
+    }
+    else
+    {
+        // AND (concat_ws(FirstName,'',LastName) LIKE \"?%\" OR concat_ws(LastName,'',FirstName) LIKE \"?%\")
+        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT('%',?))");       
+        $countStatement->bind_param("iss", $userId, $contactName,$contactName);
+        $countStatement->execute();
+    }
+
+    $countResult = $countStatement->get_result();
+    $totalCount = mysqli_fetch_assoc($countResult)["num"];
+
+    if ($totalCount == 0) {
+        http_response_code(404);
+        echo json_encode(array("contactcount"=>$totalCount));
         return;
     }
+
+    $contactResult = null;
     
-    $countStatement = empty($contactName) ? "SELECT COUNT(*) as num FROM Contacts WHERE UserID = $userId LIMIT $skipped, $perPage" :
-    "SELECT COUNT(*) as num FROM Contacts WHERE UserID = $userId AND (concat_ws(FirstName,'',LastName) LIKE \"$contactName%\" OR concat_ws(LastName,'',FirstName) LIKE \"$contactName%\") LIMIT $skipped, $perPage";
-    $countResult = mysqli_query($conn,$countStatement);
+    if(empty($contactName))
+    {
+        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? LIMIT ?,?");
+        //$succesChek = $stmt->bind_param("iii", $userId,$skipped,$perPage);
+        $stmt->bind_param("iii",$userId,$skipped,$perPage);
+        $stmt->execute();
+        $contactResult = $stmt->get_result();
+    }
+    else
+    {
+        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT('%',?)) LIMIT ?, ?");
+		$stmt->bind_param("issii", $userId,$contactName,$contactName, $skipped,$perPage);
+		$stmt->execute();
+        $contactResult = $stmt->get_result();
+    }
 
-    $totalCount = mysqli_fetch_assoc($countResult)["num"];
-    $dataArray = array();
-
-    //Contact Count needs to be thought about for a bit. It should hold how many contacts there should have been without the limit.
     $dataArray["contactcount"] = $totalCount;
     
     $contactArray = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    while ($row = mysqli_fetch_assoc($contactResult)) {
         $id = $row['ID'];
         //$dateCreated = $row['DateCreated'];
         //$dateLastLoggedIn = $row['DateLastLoggedIn']
         $firstName = $row['FirstName'];
         $lastName = $row['LastName'];
-        $email = $row['email'];
-        $phone = $row['phone'];
+        $email = $row['Email'];
+        $phone = $row['Phone'];
 
         $data = response($id, $firstName, $lastName, $email,$phone);
         array_push($contactArray, $data);
