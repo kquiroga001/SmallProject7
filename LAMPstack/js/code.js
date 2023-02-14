@@ -25,7 +25,7 @@ function doLogin()
 
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Conten   t-type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
 		xhr.onreadystatechange = function() 
@@ -110,18 +110,25 @@ function doLogout()
 
 function register()
 {
+	console.log();
 	//Initialize data
 	userId = 0;
-	firstName = document.getElementById("firstName").value;;
-	lastName = document.getElementById("lastName").value;;
+	firstName = document.getElementById("firstName").value;
+	lastName = document.getElementById("lastName").value;
 	let login = document.getElementById("loginName").value;
 	let password = document.getElementById("loginPassword").value;
 
-	//Connect to API and start request
+	let tmp = {
+		firstName:firstName,
+		lastName:lastName,
+		login:login,
+		password:password
+	};
+	let jsonPayload = JSON.stringify( tmp );
 	let url = urlBase + '/SignUp.' + extension;
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Conten   t-type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
 		xhr.onreadystatechange = function() 
@@ -130,13 +137,12 @@ function register()
 			{
 				let jsonObject = JSON.parse( xhr.responseText );
 				userId = jsonObject.id;
-		
-				if(userId < 1 || firstName =="" || lastName =="" || login =="" || password =="")
-				{		
-					document.getElementById("loginResult").innerHTML = "One or more fields are incorrect/missing";
+				window.location.href = "index.html";
+				if(firstName ==""){
+					document.getElementById("loginResult").value = "One or more fields missing";
 					return;
 				}
-				window.location.href = "index.html";
+
 			}
 		};
 		xhr.send(jsonPayload);
@@ -146,6 +152,20 @@ function register()
 		document.getElementById("loginResult").innerHTML = err.message;
 	}
 }
+
+function fieldCheck(){
+	firstName = document.getElementById("firstName").value;
+	lastName = document.getElementById("lastName").value;
+	let login = document.getElementById("loginName").value;
+	let password = document.getElementById("loginPassword").value;
+	if(firstName=="" || lastName=="" || login=="" || password==""){
+		document.getElementById("loginResult").value = "One or more fields missing";
+		return;
+	}
+	else 
+		register();
+}
+
 
 function addColor()
 {

@@ -19,7 +19,7 @@ if( $conn->connect_error )
 }
 else
 {
-    $query = "INSERT INTO COP4331.Users(ID, firstName, lastName, Login, Password) VALUES (\"".$inData["firstName"]."\",\"".$inData["lastName"]."\",\"".$inData["login"]."\",\"".$inData["password"]."\")";
+    $query = "INSERT INTO COP4331.Users(firstName, lastName, Login, Password) VALUES (\"".$inData["firstName"]."\",\"".$inData["lastName"]."\",\"".$inData["login"]."\",\"".$inData["password"]."\")";
     $msg = [];
     try{
         $msg["successful"] = true;
