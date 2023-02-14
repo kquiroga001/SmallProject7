@@ -65,11 +65,11 @@ else
     }
 
     $contactResult = null;
-
+    
     if(empty($contactName))
     {
         $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? LIMIT ?,?");
-        //$successCheck = $stmt->bind_param("iii", $userId,$skipped,$perPage);
+        //$succesCheck = $stmt->bind_param("iii", $userId,$skipped,$perPage);
         $stmt->bind_param("iii",$userId,$skipped,$perPage);
         $stmt->execute();
         $contactResult = $stmt->get_result();
