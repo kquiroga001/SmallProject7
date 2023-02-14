@@ -1,4 +1,4 @@
-const urlBase = 'http://COP4331-5.com/LAMPAPI';
+const urlBase = 'http://spg7cop4331.com/LAMPAPI';
 const extension = 'php';
 
 let userId = 0;
@@ -107,6 +107,64 @@ function doLogout()
 	document.cookie = "firstName= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
 	window.location.href = "index.html";
 }
+
+function register()
+{
+	console.log();
+	//Initialize data
+	userId = 0;
+	firstName = document.getElementById("firstName").value;
+	lastName = document.getElementById("lastName").value;
+	let login = document.getElementById("loginName").value;
+	let password = document.getElementById("loginPassword").value;
+
+	let tmp = {
+		firstName:firstName,
+		lastName:lastName,
+		login:login,
+		password:password
+	};
+	let jsonPayload = JSON.stringify( tmp );
+	let url = urlBase + '/SignUp.' + extension;
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.onreadystatechange = function() 
+		{
+			if (this.readyState == 4 && this.status == 200) //api successfully connected
+			{
+				let jsonObject = JSON.parse( xhr.responseText );
+				userId = jsonObject.id;
+				window.location.href = "index.html";
+				if(firstName ==""){
+					document.getElementById("loginResult").innerHTML = "One or more fields missing";
+					return;
+				}
+			}
+		};
+		xhr.send(jsonPayload);
+	}
+	catch(err)
+	{
+		document.getElementById("loginResult").innerHTML = err.message;
+	}
+}
+
+function fieldCheck(){
+	firstName = document.getElementById("firstName").value;
+	lastName = document.getElementById("lastName").value;
+	let login = document.getElementById("loginName").value;
+	let password = document.getElementById("loginPassword").value;
+	if(firstName=="" || lastName=="" || login=="" || password==""){
+		document.getElementById("loginResult").value = "One or more fields missing";
+		return;
+	}
+	else 
+		register();
+}
+
 
 function addColor()
 {
