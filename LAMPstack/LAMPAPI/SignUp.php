@@ -14,26 +14,54 @@ if( $conn->connect_error )
 }
 else
 {
-    //$stmt = $conn->prepare("SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password =?");
-    $stmt = $conn->prepare(("INSERT INTO COP4331.Users(FirstName, LastName, Login, Password) VALUES (?,?,?,?)"));
+    $neededFieldNames = ["firstname","lastname","login","password"];
 
-    $stmt->bind_param("ss", $inData["firstname"],$inData["lastname"],$inData["login"], $inData["password"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    echo json_encode($result)
-    $stmt->close();
-    $conn->close();
+    foreach($neededFieldNames as $fieldName)
+    {
+        if(!isset($inData[$fieldName]))
+        {
+            http_response_code(400);
+            $data = [];
+            $data["error"] = "Body is missing $fieldName";
+            echo json_encode($data);
+            return;
+        }
+    }
+
+    /*ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);*/
+
+    //$stmt = $conn->prepare("SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password =?");
+    try
+    {
+        $stmt = $conn->prepare(("INSERT INTO Users (FirstName, LastName, Login, Password) VALUES (?,?,?,?)"));
+        $stmt->bind_param("ssss", $inData["firstname"],$inData["lastname"],$inData["login"], $inData["password"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $msg["error"] = "";
+        http_response_code(200);
+        sendResultInfoAsJson($msg);
+        //echo json_encode($result);
+        $stmt->close();
+        $conn->close(); 
+    }
+    catch(Exception $ex)
+    {
+        $msg["error"] = "unsuccessful";
+        sendResultInfoAsJson($msg);
+        http_response_code(409);
+    }
 }
 
 function getRequestInfo()
 {
     return json_decode(file_get_contents('php://input'), true);
 }
-
 function sendResultInfoAsJson( $obj )
 {
-    header('Content-type: application/json');
-    echo $obj;
+    echo json_encode($obj);
 }
 
 function returnWithError( $err )
