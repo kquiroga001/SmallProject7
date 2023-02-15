@@ -15,7 +15,7 @@ if( $conn->connect_error )
 }
 else
 {
-    $neededFieldNames = ["userid","name"];
+    $neededFieldNames = ["userid","search"];
 
     foreach($neededFieldNames as $fieldName)
     {
@@ -23,15 +23,16 @@ else
         {
             http_response_code(400);
             $data = [];
-            $data["error"] = "Body is missing $fieldName";
+            $data["error"] = "Body is missing $fieldName field";
             echo json_encode($data);
             return;
         }
     }
 
     $userId = $inData["userid"];
-    $contactName = $inData["name"];
-    $contactName = str_replace(' ', '', $contactName);
+    $searchValue = $inData["search"];
+    $searchValue = str_replace(' ', '', $searchValue);
+    $phoneNumber = str_replace('-','',$searchValue);
     $page = isset($inData["page"]) ? $inData["page"] : 1;
     $perPage = (isset($inData["perpage"])) ? $inData["perpage"] : 10;
     $skipped = $perPage * ($page-1);
@@ -41,7 +42,7 @@ else
     error_reporting(E_ALL);
     ini_set('display_errors', 'On');
 
-    if(empty($contactName))
+    if(empty($searchValue))
     {
         $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ?");
 		$countStatement->bind_param("i", $userId);
@@ -50,8 +51,8 @@ else
     else
     {
         // AND (concat_ws(FirstName,'',LastName) LIKE \"?%\" OR concat_ws(LastName,'',FirstName) LIKE \"?%\")
-        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR Phone LIKE CONCAT(?,'%'));");       
-        $countStatement->bind_param("issss", $userId, $contactName,$contactName,$contactName,$contactName);
+        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR REPLACE(Phone,'-','') LIKE CONCAT(?,'%'));");       
+        $countStatement->bind_param("issss", $userId, $searchValue,$searchValue,$searchValue,$phoneNumber);
         $countStatement->execute();
     }
 
@@ -66,7 +67,7 @@ else
 
     $contactResult = null;
 
-    if(empty($contactName))
+    if(empty($searchValue))
     {
         $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? LIMIT ?,?");
         //$successCheck = $stmt->bind_param("iii", $userId,$skipped,$perPage);
@@ -76,8 +77,8 @@ else
     }
     else
     {
-        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR Phone LIKE CONCAT(?,'%')) LIMIT ?, ?");
-		$stmt->bind_param("issssii", $userId,$contactName,$contactName,$contactName,$contactName, $skipped,$perPage);
+        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR REPLACE(Phone,'-','') LIKE CONCAT(?,'%')) LIMIT ?, ?");
+		$stmt->bind_param("issssii", $userId,$searchValue,$searchValue,$searchValue,$phoneNumber, $skipped,$perPage);
 		$stmt->execute();
         $contactResult = $stmt->get_result();
     }
