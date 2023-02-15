@@ -44,14 +44,14 @@ else
     if(empty($contactName))
     {
         $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ?");
-		$countStatement->bind_param("iii", $userId);
+		$countStatement->bind_param("i", $userId);
 		$countStatement->execute();    
     }
     else
     {
         // AND (concat_ws(FirstName,'',LastName) LIKE \"?%\" OR concat_ws(LastName,'',FirstName) LIKE \"?%\")
-        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT('%',?))");       
-        $countStatement->bind_param("iss", $userId, $contactName,$contactName);
+        $countStatement = $conn->prepare("SELECT COUNT(*) as num FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR Phone LIKE CONCAT(?,'%'));");       
+        $countStatement->bind_param("issss", $userId, $contactName,$contactName,$contactName,$contactName);
         $countStatement->execute();
     }
 
@@ -65,19 +65,19 @@ else
     }
 
     $contactResult = null;
-    
+
     if(empty($contactName))
     {
         $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? LIMIT ?,?");
-        //$succesChek = $stmt->bind_param("iii", $userId,$skipped,$perPage);
+        //$successCheck = $stmt->bind_param("iii", $userId,$skipped,$perPage);
         $stmt->bind_param("iii",$userId,$skipped,$perPage);
         $stmt->execute();
         $contactResult = $stmt->get_result();
     }
     else
     {
-        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT('%',?)) LIMIT ?, ?");
-		$stmt->bind_param("issii", $userId,$contactName,$contactName, $skipped,$perPage);
+        $stmt = $conn->prepare("SELECT * FROM Contacts WHERE UserID = ? AND (concat_ws(FirstName,'',LastName) LIKE CONCAT(?,'%') OR concat_ws(LastName,'',FirstName) LIKE CONCAT(?,'%') OR Email LIKE CONCAT(?,'%') OR Phone LIKE CONCAT(?,'%')) LIMIT ?, ?");
+		$stmt->bind_param("issssii", $userId,$contactName,$contactName,$contactName,$contactName, $skipped,$perPage);
 		$stmt->execute();
         $contactResult = $stmt->get_result();
     }
