@@ -14,10 +14,23 @@
 	}
 	else
 	{
+
+        $neededFieldNames = ["login","password"];
+
+		foreach($neededFieldNames as $fieldName)
+		{
+			if(!isset($inData[$fieldName]))
+			{
+				http_response_code(400);
+				$data = [];
+				$data["error"] = "Body is missing $fieldName";
+				echo json_encode($data);
+				return;
+			}
+		}
+        
 		$stmt = $conn->prepare("SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password =?");
 		$stmt->bind_param("ss", $inData["login"], $inData["password"]);
-		echo json_encode($inData); //we added 1/20
-		echo json_encode($_GET);//we added 1/20
 		$stmt->execute();
 		$result = $stmt->get_result();
 
@@ -28,6 +41,8 @@
 		else
 		{
 			returnWithError("No Records Found");
+			http_response_code(404);
+
 		}
 
 		$stmt->close();
