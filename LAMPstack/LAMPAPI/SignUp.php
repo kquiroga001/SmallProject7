@@ -1,10 +1,5 @@
 
 <?php
-
-header("Content-Type: application/json");
-header("Acess-Control-Allow-Origin: *");
-header("Acess-Control-Allow-Methods: POST");
-
 //We need firstname, lastname, and the login and password
 $inData = getRequestInfo();
 
@@ -19,33 +14,66 @@ if( $conn->connect_error )
 }
 else
 {
+    $neededFieldNames = ["firstname","lastname","login","password"];
 
+    foreach($neededFieldNames as $fieldName)
+    {
+        if(!isset($inData[$fieldName]))
+        {
+            http_response_code(400);
+            $data = [];
+            $data["error"] = "Body is missing $fieldName";
+            echo json_encode($data);
+            return;
+        }
+    }
 
-    $query = "INSERT INTO COP4331.Users(FirstName, LastName, Login, Password) VALUES (\"".$inData["firstname"]."\",\"".$inData["lastname"]."\",\"".$inData["login"]."\",\"".$inData["password"]."\")";
-    $msg = [];
-    try{
-        $msg["successful"] = true;
-        $result = mysqli_query($conn,$query);
+    /*ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);*/
+
+    //$stmt = $conn->prepare("SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password =?");
+    try
+    {
+        $stmt = $conn->prepare(("INSERT INTO Users (FirstName, LastName, Login, Password) VALUES (?,?,?,?)"));
+        $stmt->bind_param("ssss", $inData["firstname"],$inData["lastname"],$inData["login"], $inData["password"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $msg["error"] = "";
         http_response_code(200);
         sendResultInfoAsJson($msg);
+        //echo json_encode($result);
+        $stmt->close();
+        $conn->close(); 
     }
-    catch(exception)
+    catch(Exception $ex)
     {
-        $msg["successful"] = false;
-        http_response_code(409);
+        $msg["error"] = "unsuccessful";
         sendResultInfoAsJson($msg);
+        http_response_code(409);
     }
-    
-    $conn->close();
 }
 
 function getRequestInfo()
 {
     return json_decode(file_get_contents('php://input'), true);
 }
-
 function sendResultInfoAsJson( $obj )
 {
     echo json_encode($obj);
 }
+
+function returnWithError( $err )
+{
+    $retValue = '{"id":0,"firstName":"","lastName":"","error":"' . $err . '"}';
+    sendResultInfoAsJson( $retValue );
+}
+
+function returnWithInfo( $firstName, $lastName, $id )
+{
+    $retValue = '{"id":' . $id . ',"firstName":"' . $firstName . '","lastName":"' . $lastName . '","error":""}';
+    sendResultInfoAsJson( $retValue );
+}
+
 ?>
