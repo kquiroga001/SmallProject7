@@ -14,7 +14,8 @@ if ($conn->connect_error)
 } 
 else
 {
-    $neededFieldNames = ["contactid","firstname","lastname", "email", "phone"];
+    
+    $neededFieldNames = ["contactid", "userid"];
 
     foreach($neededFieldNames as $fieldName)
     {
@@ -28,12 +29,40 @@ else
         }
     }
 
+    $stmt = $conn->prepare("SELECT  FirstName FROM Contacts WHERE ID = ? AND UserID = ?");
+    $stmt->bind_param("ii", $inData["contactid"], $inData["userid"]);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 0) 
+    {
+        http_response_code(404);
+        $msg["error"] = "No records found";
+        echo json_encode($msg);
+        $stmt->close();
+        $conn->close();
+        return;
+    }
+    /*$affected = $conn->affected_rows;
+
+    if($affected == 0)
+    {
+        http_response_code(404);
+        $msg = array();
+        $msg["error"] = "No records found";
+        echo json_encode($msg);
+        $stmt->close();
+        $conn->close();
+        return;
+    }*/
+
+
     if ($inData["lastname"] != "")
     {
         try
         {
-            $stmt = $conn->prepare("UPDATE Contacts SET LastName  = ? WHERE ID = ?");
-            $stmt->bind_param("si", $inData["lastname"], $inData["contactid"]);
+            $stmt = $conn->prepare("UPDATE Contacts SET LastName  = ? WHERE ID = ? AND UserID = ?");
+            $stmt->bind_param("sii", $inData["lastname"], $inData["contactid"], $inData["userid"]);
             $stmt->execute();
         }
         catch(exception)
@@ -49,8 +78,8 @@ else
     {
         try
         {
-            $stmt = $conn->prepare("UPDATE Contacts SET FirstName  = ? WHERE ID = ?");
-            $stmt->bind_param("ss", $inData["firstname"], $inData["contactid"]);
+            $stmt = $conn->prepare("UPDATE Contacts SET FirstName  = ? WHERE ID = ? AND UserID = ?");
+            $stmt->bind_param("sii", $inData["firstname"], $inData["contactid"], $inData["userid"]);
             $stmt->execute();
             
         }
@@ -70,8 +99,8 @@ else
     {
         try
         {
-            $stmt = $conn->prepare("UPDATE Contacts SET Email  = ? WHERE ID = ?");
-            $stmt->bind_param("ss", $inData["email"], $inData["contactid"]);
+            $stmt = $conn->prepare("UPDATE Contacts SET Email  = ? WHERE ID = ? AND UserID = ?");
+            $stmt->bind_param("sii", $inData["email"], $inData["contactid"], $inData["userid"]);
             $stmt->execute();
         }
         catch(exception)
@@ -90,8 +119,8 @@ else
     {
         try
         {
-            $stmt = $conn->prepare("UPDATE Contacts SET Phone  = ? WHERE ID = ?");
-            $stmt->bind_param("ss", $inData["phone"], $inData["contactid"]);
+            $stmt = $conn->prepare("UPDATE Contacts SET Phone  = ? WHERE ID = ? AND UserID = ?");
+            $stmt->bind_param("sii", $inData["phone"], $inData["contactid"], $inData["userid"]);
             $stmt->execute();
             
         }
@@ -106,23 +135,9 @@ else
 
     }
 
-    $affected = $conn->affected_rows;
-
-    if($affected == 0)
-    {
-        http_response_code(404);
-        $msg = array();
-        $msg["error"] = "No records found";
-        echo json_encode($msg);
-        return;
-    }
-    else
-    {
-        http_response_code(200);
-        $msg["error"] = "";
-        sendResultInfoAsJson($msg);
-    }
-
+    $msg["error"] = "";
+    http_response_code(200);
+   sendResultInfoAsJson($msg);
     $stmt->close();
     $conn->close();
 }
