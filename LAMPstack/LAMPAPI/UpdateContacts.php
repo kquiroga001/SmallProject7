@@ -29,33 +29,31 @@ else
         }
     }
 
-    $stmt = $conn->prepare("SELECT  FirstName FROM Contacts WHERE ID = ? AND UserID = ?");
-    $stmt->bind_param("ii", $inData["contactid"], $inData["userid"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows == 0) 
+    try
     {
-        http_response_code(404);
-        $msg["error"] = "No records found";
-        echo json_encode($msg);
-        $stmt->close();
-        $conn->close();
-        return;
+        $stmt = $conn->prepare("SELECT  FirstName FROM Contacts WHERE ID = ? AND UserID = ?");
+        $stmt->bind_param("ii", $inData["contactid"], $inData["userid"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows == 0) 
+        {
+            http_response_code(404);
+            $msg["error"] = "No records found";
+            echo json_encode($msg);
+            $stmt->close();
+            $conn->close();
+            return;
+        }
     }
-    /*$affected = $conn->affected_rows;
-
-    if($affected == 0)
+    catch(exception)
     {
-        http_response_code(404);
-        $msg = array();
-        $msg["error"] = "No records found";
-        echo json_encode($msg);
+        $msg["error"] = "unsuccessful";
+        http_response_code(409);
+        sendResultInfoAsJson($msg);
         $stmt->close();
         $conn->close();
-        return;
-    }*/
-
+    }
 
     if ($inData["lastname"] != "")
     {
